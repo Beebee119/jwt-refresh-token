@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import com.example.jwtrefreshtoken.exceptions.TokenRevokedException;
 import com.example.jwtrefreshtoken.models.UserDetailsImpl;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -39,21 +41,19 @@ public class JwtService {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 
-    public String generateJwtAccessToken(Authentication authentication) {
-        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+    public String generateJwtAccessToken(String username) {
         return  Jwts.builder()
-                    .setSubject(userPrincipal.getUsername())
-                    .setIssuedAt(new Date())
+                    .setSubject(username)
+                    .setIssuedAt(new Date(System.currentTimeMillis()))
                     .setExpiration(new Date(System.currentTimeMillis() + jwtAccessTokenExpiration))
                     .signWith(key(jwtAccessTokenSecret), SignatureAlgorithm.HS256)
                     .compact();
     }
 
-    public String generateJwtRefreshToken(Authentication authentication) {
-        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+    public String generateJwtRefreshToken(String username) {
         return  Jwts.builder()
-                    .setSubject(userPrincipal.getUsername())
-                    .setIssuedAt(new Date())
+                    .setSubject(username)
+                    .setIssuedAt(new Date(System.currentTimeMillis()))
                     .setExpiration(new Date(System.currentTimeMillis() + jwtRefreshTokenExpiration))
                     .signWith(key(jwtRefreshTokenSecret), SignatureAlgorithm.HS256)
                     .compact();
@@ -62,6 +62,15 @@ public class JwtService {
     public String getUsernameFromJwtAccessToken(String token) {
         return Jwts.parserBuilder()
                     .setSigningKey(key(jwtAccessTokenSecret))
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+    }
+
+    public String getUsernameFromJwtRefreshToken(String token) {
+        return Jwts.parserBuilder()
+                    .setSigningKey(key(jwtRefreshTokenSecret))
                     .build()
                     .parseClaimsJws(token)
                     .getBody()
@@ -104,5 +113,12 @@ public class JwtService {
             logger.error("JWT Refresh Token claims string is empty: {}", e.getMessage());
         }
         return false;
+    }
+
+    public String parseJwt(String token) {
+        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
+            return token.split(" ")[1].trim();
+        }
+        return null;
     }
 }
