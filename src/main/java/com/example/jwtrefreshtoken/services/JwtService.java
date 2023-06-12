@@ -2,16 +2,17 @@ package com.example.jwtrefreshtoken.services;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 
+import com.example.jwtrefreshtoken.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.example.jwtrefreshtoken.exceptions.TokenRevokedException;
-import com.example.jwtrefreshtoken.models.UserDetailsImpl;
+import com.example.jwtrefreshtoken.models.User;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -77,7 +78,7 @@ public class JwtService {
                     .getSubject();
     }
 
-    public boolean validateJwtAccessToken(String authToken) {
+    public boolean validateJwtAccessToken(String authToken) throws AuthenticationException {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key(jwtAccessTokenSecret))
@@ -85,18 +86,21 @@ public class JwtService {
                     .parse(authToken);
             return true;
         } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT Access Token: {}", e.getMessage());
+           logger.error("Invalid JWT Access Token: {}", e.getMessage());
+            throw new TokenInvalidException("Error: JWT Access Token is invalid");
         } catch (ExpiredJwtException e) {
-            logger.error("Expired JWT Access Token: {}", e.getMessage());
+           logger.error("Expired JWT Access Token: {}", e.getMessage());
+            throw new TokenExpiredException("Error: JWT Access Token is expired");
         } catch (UnsupportedJwtException e) {
-            logger.error("JWT Access Token is unsupported: {}", e.getMessage());
+           logger.error("JWT Access Token is unsupported: {}", e.getMessage());
+            throw new TokenUnsupportedException("Error: JWT Access Token is unsupported");
         } catch (IllegalArgumentException e) {
-            logger.error("JWT Access Token claims string is empty: {}", e.getMessage());
+           logger.error("JWT Access Token claims string is empty: {}", e.getMessage());
+            throw new TokenEmptyClaimException("Error: JWT Access Token claims string is empty");
         }
-        return false;
     }
     
-    public boolean validateJwtRefreshToken(String authToken) {
+    public boolean validateJwtRefreshToken(String authToken) throws AuthenticationException {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key(jwtRefreshTokenSecret))
@@ -104,15 +108,18 @@ public class JwtService {
                     .parse(authToken);
             return true;
         } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT Refresh Token: {}", e.getMessage());
+           logger.error("Invalid JWT Refresh Token: {}", e.getMessage());
+            throw new TokenInvalidException("Error: JWT Refresh Token is invalid");
         } catch (ExpiredJwtException e) {
-            logger.error("Expired JWT Refresh Token: {}", e.getMessage());
+           logger.error("Expired JWT Refresh Token: {}", e.getMessage());
+            throw new TokenExpiredException("Error: JWT Refresh Token is expired");
         } catch (UnsupportedJwtException e) {
-            logger.error("JWT Refresh Token is unsupported: {}", e.getMessage());
+           logger.error("JWT Refresh Token is unsupported: {}", e.getMessage());
+            throw new TokenUnsupportedException("Error: JWT Refresh Token is unsupported");
         } catch (IllegalArgumentException e) {
-            logger.error("JWT Refresh Token claims string is empty: {}", e.getMessage());
+           logger.error("JWT Refresh Token claims string is empty: {}", e.getMessage());
+            throw new TokenEmptyClaimException("Error: JWT Refresh Token claims string is empty");
         }
-        return false;
     }
 
     public String parseJwt(String token) {
@@ -120,5 +127,9 @@ public class JwtService {
             return token.split(" ")[1].trim();
         }
         return null;
+    }
+
+    public String generateEmailVerificationToken(User user) {
+        return UUID.randomUUID().toString();
     }
 }

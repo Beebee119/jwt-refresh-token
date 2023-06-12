@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.example.jwtrefreshtoken.models.RoleType;
 import com.example.jwtrefreshtoken.models.Role;
 import com.example.jwtrefreshtoken.models.User;
+import com.example.jwtrefreshtoken.models.UserStatus;
 import com.example.jwtrefreshtoken.repositories.RoleRepository;
 import com.example.jwtrefreshtoken.repositories.UserRepository;
 
@@ -26,9 +27,9 @@ public class SeedDatabase {
             if(roleRepository.findByName(RoleType.ROLE_ADMIN).isPresent()) {
                 return;
             }
-            Role adminRole = roleRepository.save(new Role(RoleType.ROLE_ADMIN));
-            Role moderatorRole = roleRepository.save(new Role(RoleType.ROLE_MODERATOR));
-            Role userRole = roleRepository.save(new Role(RoleType.ROLE_USER));
+            Role adminRole = roleRepository.save(Role.builder().name(RoleType.ROLE_ADMIN).build());
+            Role moderatorRole = roleRepository.save(Role.builder().name(RoleType.ROLE_MODERATOR).build());
+            Role userRole = roleRepository.save(Role.builder().name(RoleType.ROLE_USER).build());
             logger.info("Perloading " + adminRole);
             logger.info("Perloading " + moderatorRole);
             logger.info("Perloading " + userRole);
@@ -38,12 +39,22 @@ public class SeedDatabase {
             adminRoles.add(adminRole);
             moderatorRoles.add(moderatorRole);
 
-            logger.info("Perloading " + userRepository.save(new User(
-                "admin 1", "admin1.email@test.com", passwordEncoder.encode("password"), adminRoles))
+            logger.info("Perloading " + userRepository.save(User.builder()
+                .username("admin 1")
+                .email("admin1.email@test.com")
+                .password(passwordEncoder.encode("password"))
+                .roles(adminRoles)
+                .userStatus(UserStatus.ACTIVE)
+                .build())
             );
-
-            logger.info("Perloading " + userRepository.save(new User(
-                "moderator 1", "moderator1.email@test.com", passwordEncoder.encode("password"), moderatorRoles))
+            
+            logger.info("Perloading " + userRepository.save(User.builder()
+                .username("moderator 1")
+                .email("moderator1.email@test.com")
+                .password(passwordEncoder.encode("password"))
+                .roles(moderatorRoles)
+                .userStatus(UserStatus.ACTIVE)
+                .build())
             );
         };
     }
