@@ -27,7 +27,7 @@ import com.example.jwtrefreshtoken.services.UserDetailsServiceImpl;
 // (securedEnabled = True, jsr250Enabled = true, prePostEnabled = true) by default
 public class WebSecurityConfig {
     @Autowired
-    UserDetailsServiceImpl userDetailsServiceImpl;
+    private UserDetailsServiceImpl userDetailsServiceImpl;
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
@@ -66,14 +66,21 @@ public class WebSecurityConfig {
                 exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> 
-                auth.requestMatchers("api/v1/auth/**").permitAll()
+                auth.requestMatchers(
+                    "api/v1/auth/register",
+                    "api/v1/auth/login",
+                    "api/v1/auth/refresh"
+                ).permitAll()
             .anyRequest().authenticated()
             );
+        http
+            .logout()
+            .logoutUrl("api/v1/auth/logout")
+            .logoutSuccessUrl("/api/v1/auth/login");
         http
             .authenticationProvider(authenticationProvider());
         http
             .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-    
 }
