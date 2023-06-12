@@ -11,35 +11,45 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
     private static final Long serialVersionUID = 1L;
 
+    @NonNull
     private Long id;
-
+    
+    @NonNull
     private String username;
 
+    @NonNull
     private String email;
 
     @JsonIgnore
+    @NonNull
     private String password;
 
     private Collection<? extends GrantedAuthority> authorities;
-
-    public UserDetailsImpl(Long id, String username, String email, String password, Collection <? extends GrantedAuthority> authorities) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.authorities = authorities;
-    }
 
     public static UserDetailsImpl build(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
             new SimpleGrantedAuthority(role.getName().name()))
         .collect(Collectors.toList());
         
-        return new UserDetailsImpl(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), authorities);
+        return UserDetailsImpl.builder()
+            .id(user.getId())
+            .username(user.getUsername())
+            .email(user.getEmail())
+            .password(user.getPassword())
+            .authorities(authorities)
+            .build();
     }
 
     public static Long getSerialversionuid() {

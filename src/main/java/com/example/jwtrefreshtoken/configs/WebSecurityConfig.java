@@ -69,6 +69,7 @@ public class WebSecurityConfig {
                 auth.requestMatchers(
                     "api/v1/auth/register",
                     "api/v1/auth/login",
+                    "api/v1/auth/confirm-account",
                     "api/v1/auth/refresh"
                 ).permitAll()
             .anyRequest().authenticated()
