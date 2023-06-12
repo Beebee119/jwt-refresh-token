@@ -1,10 +1,12 @@
 package com.example.jwtrefreshtoken.payloads.requests;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class RefreshRequest {
     
-    @NotBlank
+    @NotNull(message = "refresh token cannot be null")
+    @NotBlank(message = "refresh token cannot be blank")
     private String refreshToken;
 
     public RefreshRequest() {}

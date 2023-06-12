@@ -1,13 +1,18 @@
 package com.example.jwtrefreshtoken.payloads.requests;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class LoginRequest {
-    
-    @NotBlank
+    @NotNull(message = "username cannot be null")
+    @NotBlank(message = "username cannot be blank")
+    @Size(min = 3, max = 20, message = "username must be between 3 and 20 characters")
     private String username;
 
-    @NotBlank
+    @NotNull(message = "password cannot be null")
+    @NotBlank(message = "password cannot be blank")
+    @Size(min = 8, max = 40, message = "password must be between 8 and 40 characters")
     private String password;
 
     public LoginRequest() {}

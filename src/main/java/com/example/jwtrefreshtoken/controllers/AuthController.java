@@ -1,6 +1,5 @@
 package com.example.jwtrefreshtoken.controllers;
 
-import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,6 +13,7 @@ import com.example.jwtrefreshtoken.payloads.requests.LoginRequest;
 import com.example.jwtrefreshtoken.payloads.requests.RefreshRequest;
 import com.example.jwtrefreshtoken.payloads.requests.RegisterRequest;
 import com.example.jwtrefreshtoken.services.AuthService;
+import jakarta.validation.Valid;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)

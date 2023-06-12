@@ -3,21 +3,29 @@ package com.example.jwtrefreshtoken.payloads.requests;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 
 public class RegisterRequest {
     
-    @NotBlank
-    @Size(min = 3, max = 20)
+    @NotNull(message = "username cannot be null")
+    @NotBlank(message = "username cannot be blank")
+    @Size(min = 3, max = 20, message = "username must be between 3 and 20 characters")
     private String username;
-
-    @NotBlank
-    @Size(max = 50)
+    
+    @Pattern(regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@" 
+        + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$", message = "email is not valid")
+    @NotNull(message = "email cannot be null")
+    @NotBlank(message = "email cannot be blank")
+    @Size(max = 50, message = "email cannot be more than 50 characters")
     private String email;
 
-    @NotBlank
-    @Size(min = 8, max = 40)
+    @NotNull(message = "password cannot be null")
+    @NotBlank(message = "password cannot be blank")
+    @Size(min = 8, max = 40, message = "password must be between 8 and 40 characters")
     private String password;
 
     private Set<String> roles = new HashSet<>();

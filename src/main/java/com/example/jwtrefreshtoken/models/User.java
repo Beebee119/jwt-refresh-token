@@ -3,9 +3,10 @@ package com.example.jwtrefreshtoken.models;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -43,22 +44,26 @@ public class User {
     private Long id;
 
     @NonNull
-    @NotBlank
-    @Size(max = 20)
+    @NotNull(message = "username cannot be null")
+    @NotBlank(message = "username cannot be blank")
+    @Size(min = 3, max = 20, message = "username must be between 3 and 20 characters")
     private String username;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus = UserStatus.UNVERIFIED;
-
+    
     @NonNull
-    @NotBlank
-    @Size(max = 50)
+    @Pattern(regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@" 
+        + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$", message = "email is not valid")
+    @NotNull(message = "email cannot be null")
+    @NotBlank(message = "email cannot be blank")
+    @Size(max = 50, message = "email cannot be more than 50 characters")
     private String email;
 
     @NonNull
-    @NotBlank
-    @Size(max = 120)
+    @NotNull(message = "password cannot be null")
+    @NotBlank(message = "password cannot be blank")
     private String password;
 
     @Builder.Default
